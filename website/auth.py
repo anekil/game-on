@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, flash
 
 auth = Blueprint('auth', __name__)
 
@@ -24,11 +24,9 @@ def register():
         password = request.form.get('password')
 
         if len(password) < 6:
-            # error
-            pass
+            flash('Password must be at least 6 characters long', category="error")
         else:
-            # add user
-            pass
+            flash('Account created successfully!', category="success")
 
-    return render_template("register.html", isTrue=True)
+    return render_template("register.html")
 
