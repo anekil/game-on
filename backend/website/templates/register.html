@@ -3,13 +3,10 @@
     <form method="post">
         <h3>Register</h3>
         <div>
-            <label for="email">Email Address</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
-            <button type="submit" class="btn btn-primary">Register now</button>
+            <div>{{ form.email.label }}<br>{{ form.email(class="input, form-control", placeholder="Enter email") }}</div>
+            <div>{{ form.password.label }}<br>{{ form.password(class="input, form-control", placeholder="Enter password") }}</div>
+            <div>{{ form.password.label }}<br>{{ form.password(class="input, form-control", placeholder="Repeat password") }}</div>
+            <button type="submit" class="btn btn-primary">Create account</button>
         </div>
     </form>
 {% endblock %}

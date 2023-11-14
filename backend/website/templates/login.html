@@ -2,12 +2,10 @@
 {% block content %}
  <form method="post">
         <h3>Login</h3>
-        <div>
-            <label for="email">Email Address</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+        <form method="post">
+            <div>{{ form.email.label }}<br>{{ form.email(class="input, form-control", placeholder="Enter email") }}</div>
+            <div>{{ form.password.label }}<br>{{ form.password(class="input, form-control", placeholder="Enter password") }}</div>
             <button type="submit" class="btn btn-primary">Login</button>
-        </div>
+        </form>
     </form>
 {% endblock %}
