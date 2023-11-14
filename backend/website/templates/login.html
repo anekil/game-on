@@ -1,10 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
- <form method="post">
+
+    {% macro render_input(field) %}
+        <div>
+            {{ field.label }}<br>{{ field(class="input, form-control") }}
+            <ul class="errors">
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endmacro %}
+
+    <form method="post">
         <h3>Login</h3>
         <form method="post">
-            <div>{{ form.email.label }}<br>{{ form.email(class="input, form-control", placeholder="Enter email") }}</div>
-            <div>{{ form.password.label }}<br>{{ form.password(class="input, form-control", placeholder="Enter password") }}</div>
+            {{ render_input(form.email) }}
+            {{ render_input(form.password) }}
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
     </form>

@@ -1,12 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
+
+    {% macro render_input(field) %}
+        <div>
+            {{ field.label }}<br>{{ field(class="input, form-control") }}
+            <ul class="errors" style="color: red">
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endmacro %}
+
     <form method="post">
         <h3>Register</h3>
-        <div>
-            <div>{{ form.email.label }}<br>{{ form.email(class="input, form-control", placeholder="Enter email") }}</div>
-            <div>{{ form.password.label }}<br>{{ form.password(class="input, form-control", placeholder="Enter password") }}</div>
-            <div>{{ form.password.label }}<br>{{ form.password(class="input, form-control", placeholder="Repeat password") }}</div>
+        <form method="post">
+            {{ render_input(form.email) }}
+            {{ render_input(form.password) }}
+            {{ render_input(form.confirm) }}
             <button type="submit" class="btn btn-primary">Create account</button>
-        </div>
+        </form>
     </form>
 {% endblock %}
