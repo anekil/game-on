@@ -2,14 +2,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
-DB_NAME = "database.users"
+DB_NAME = "db"
 
 
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'dregyhdehdreh'
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://postgres:password@database/{DB_NAME}'
     db.init_app(app)
 
     from .views import views
