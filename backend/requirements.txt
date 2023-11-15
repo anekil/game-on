@@ -3,3 +3,4 @@ flask-login
 flask-sqlalchemy
 flask-wtf
 wtforms
+psycopg2-binary
