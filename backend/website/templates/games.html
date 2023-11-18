@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Games</h1>
+    <h2>These are games for you {{ user.email.split('@')[0] }}!</h2>
+    {{ data }}
+{% endblock %}
