@@ -15,7 +15,7 @@ def home():
 @login_required
 def games():
     url = "https://api.igdb.com/v4/games"
-    payload = "fields name, cover.url; limit 50; where total_rating > 50 & category = 0; sort total_rating_count desc; "
+    payload = "fields name, cover.url, total_rating; limit 50; where total_rating > 50 & category = 0; sort total_rating_count desc; "
     headers = {
         'Authorization': 'Bearer 7uasv2bw3iyqjavppma1c5yntc1geo',
         'Client-ID': 't6vglpbbejgf6vm4ptt5q5lsrlros2',
