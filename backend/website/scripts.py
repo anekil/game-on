@@ -32,6 +32,41 @@ def fetch_games_data():
             keywords=keywords,
             screenshots=[item["url"] for item in game_json.get("screenshots", [])]
         )
-
         db.session.add(game_data)
+    db.session.commit()
+
+
+def fetch_items(items_name):
+    url = "https://api.igdb.com/v4/" + items_name
+    payload = "fields id, name; limit 500;"
+    headers = {
+        'Authorization': 'Bearer 7uasv2bw3iyqjavppma1c5yntc1geo',
+        'Client-ID': 't6vglpbbejgf6vm4ptt5q5lsrlros2',
+    }
+    response = request("POST", url, headers=headers, data=payload)
+    return response.json()
+
+
+def fetch_all_classification_data():
+    genres = fetch_items("genres")
+    for genre in genres:
+        genre_data = Genre(
+            id=genre['id'],
+            name=genre['name'],
+        )
+        db.session.add(genre_data)
+    themes = fetch_items("themes")
+    for theme in themes:
+        theme_data = Theme(
+            id=theme['id'],
+            name=theme['name'],
+        )
+        db.session.add(theme_data)
+    keywords = fetch_items("keywords")
+    for keyword in keywords:
+        keyword_data = Keyword(
+            id=keyword['id'],
+            name=keyword['name'],
+        )
+        db.session.add(keyword_data)
     db.session.commit()
