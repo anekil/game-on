@@ -1,63 +1,87 @@
+from typing import Optional, List
+
+from sqlalchemy import Column, Table, ForeignKey
+from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
+
 from . import db
 from flask_login import UserMixin
-from sqlalchemy.dialects.postgresql import ARRAY
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(40), unique=True)
-    password = db.Column(db.String(300))
-    ratings = db.relationship('Rating', lazy=True)
+    __tablename__ = "users"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    email: Mapped[str] = mapped_column(db.String, unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(db.String, nullable=False)
+    ratings: Mapped[List["Rating"]] = relationship(back_populates="user")
 
 
 class Rating(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
-    rating = db.Column(db.Integer)
+    __tablename__ = "ratings"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    rating: Mapped[int] = mapped_column(db.Integer, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["User"] = relationship(back_populates="ratings")
+    game_id: Mapped[int] = mapped_column(ForeignKey("games.id"))
+    game: Mapped["Game"] = relationship(back_populates="ratings")
 
 
-game_genres = db.Table(
+game_genres = Table(
     'game_genres',
-    db.Column('game_id', db.Integer, db.ForeignKey('games.id'), primary_key=True),
-    db.Column('genre_id', db.Integer, db.ForeignKey('genres.id'), primary_key=True)
+    Base.metadata,
+    Column('game_id', ForeignKey('games.id')),
+    Column('genre_id', ForeignKey('genres.id'))
 )
-game_themes = db.Table(
+game_themes = Table(
     'game_themes',
-    db.Column('game_id', db.Integer, db.ForeignKey('games.id'), primary_key=True),
-    db.Column('theme_id', db.Integer, db.ForeignKey('themes.id'), primary_key=True)
+    Base.metadata,
+    Column('game_id', ForeignKey('games.id')),
+    Column('theme_id', ForeignKey('themes.id'))
 )
-game_keywords = db.Table(
+game_keywords = Table(
     'game_keywords',
-    db.Column('game_id', db.Integer, db.ForeignKey('games.id'), primary_key=True),
-    db.Column('keyword_id', db.Integer, db.ForeignKey('keywords.id'), primary_key=True)
+    Base.metadata,
+    Column('game_id', ForeignKey('games.id')),
+    Column('keyword_id', ForeignKey('keywords.id'))
 )
-
-
-class Game(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    api_id = db.Column(db.Integer, unique=True)
-    name = db.Column(db.String(40))
-    url = db.Column(db.String(80))
-    summary = db.Column(db.String(600), nullable=True)
-    cover = db.Column(db.String(80), nullable=True)
-    total_rating = db.Column(db.Integer, nullable=True)
-    genres = db.relationship('Genre', secondary=game_genres, backref=db.backref('games', lazy='dynamic'))
-    themes = db.relationship('Theme', secondary=game_themes, backref=db.backref('games', lazy='dynamic'))
-    keywords = db.relationship('Keyword', secondary=game_keywords, backref=db.backref('games', lazy='dynamic'))
-    screenshots = db.Column(ARRAY(db.String), nullable=True)
 
 
 class Genre(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40), unique=True, nullable=False)
+    __tablename__ = "genres"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    api_id: Mapped[int] = mapped_column(db.Integer, unique=True)
+    name: Mapped[str] = mapped_column(db.String)
 
 
 class Theme(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40), unique=True, nullable=False)
+    __tablename__ = "themes"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    api_id: Mapped[int] = mapped_column(db.Integer, unique=True)
+    name: Mapped[str] = mapped_column(db.String)
 
 
 class Keyword(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40), unique=True, nullable=False)
+    __tablename__ = "keywords"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    api_id: Mapped[int] = mapped_column(db.Integer, unique=True)
+    name: Mapped[str] = mapped_column(db.String)
+
+
+class Game(db.Model):
+    __tablename__ = "games"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    api_id: Mapped[int] = mapped_column(db.Integer, unique=True)
+    name: Mapped[str] = mapped_column(db.String)
+    url: Mapped[str] = mapped_column(db.String)
+    summary: Mapped[Optional[str]] = mapped_column(db.String)
+    cover: Mapped[Optional[str]] = mapped_column(db.String)
+    total_rating: Mapped[Optional[int]] = mapped_column(db.Integer)
+    genres: Mapped[List[Genre]] = relationship(secondary=game_genres)
+    themes: Mapped[List[Theme]] = relationship(secondary=game_themes)
+    keywords: Mapped[List[Keyword]] = relationship(secondary=game_keywords)
+    screenshots: Mapped[Optional[JSON]] = mapped_column(db.JSON)
+    ratings: Mapped[List["Rating"]] = relationship(back_populates="game")
