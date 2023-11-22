@@ -5,3 +5,4 @@ flask-wtf
 wtforms
 psycopg2-binary
 requests
+cryptography

@@ -1,3 +1,4 @@
+version: '3.9'
 services:
   backend:
     build:
@@ -12,22 +13,32 @@ services:
         condition: service_healthy
     networks:
       - backend-db
+    environment:
+      - FLASK_APP=main.py
+      - FLASK_RUN_HOST=0.0.0.0
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD_FILE=/run/secrets/db-password
+      - MYSQL_DB=db
 
   database:
-    image: postgres
+    image: mysql
     secrets:
       - db-password
+      - db-root-password
     environment:
-       POSTGRES_USER: postgres
-       POSTGRES_PASSWORD_FILE: /run/secrets/db-password
-       POSTGRES_DB: db
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-root-password
+      - MYSQL_DATABASE=db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD_FILE=/run/secrets/db-password
     healthcheck:
-       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-       interval: 5s
-       timeout: 5s
-       retries: 5
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --password=$$(cat /run/secrets/db-root-password)"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/mysql
     networks:
       - backend-db
 
@@ -37,6 +48,8 @@ volumes:
 secrets:
   db-password:
     file: userDatabase/password.txt
+  db-root-password:
+    file: userDatabase/root_password.txt
 
 networks:
   backend-db:

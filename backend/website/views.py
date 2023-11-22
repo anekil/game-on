@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
-from .models import Game
+from .scripts import get_all_games
 
 views = Blueprint('views', __name__)
 
@@ -29,5 +29,4 @@ def serialize_game(game):
 @views.route('/games')
 @login_required
 def games():
-    game = Game.query.get(1)
-    return render_template("games.html", user=current_user, data=serialize_game(game))
+    return render_template("games.html", user=current_user, data=[serialize_game(game) for game in get_all_games()])

@@ -1,22 +1,18 @@
 from typing import Optional, List
 
 from sqlalchemy import Column, Table, ForeignKey
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.mysql import JSON
 from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
 
-from . import db
+from . import db, Base
 from flask_login import UserMixin
-
-
-class Base(DeclarativeBase):
-    pass
 
 
 class User(db.Model, UserMixin):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    email: Mapped[str] = mapped_column(db.String, unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(db.String, nullable=False)
+    email: Mapped[str] = mapped_column(db.String(50), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(db.String(200), nullable=False)
     ratings: Mapped[List["Rating"]] = relationship(back_populates="user")
 
 
@@ -53,32 +49,28 @@ game_keywords = Table(
 class Genre(db.Model):
     __tablename__ = "genres"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    api_id: Mapped[int] = mapped_column(db.Integer, unique=True)
-    name: Mapped[str] = mapped_column(db.String)
+    name: Mapped[str] = mapped_column(db.String(80))
 
 
 class Theme(db.Model):
     __tablename__ = "themes"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    api_id: Mapped[int] = mapped_column(db.Integer, unique=True)
-    name: Mapped[str] = mapped_column(db.String)
+    name: Mapped[str] = mapped_column(db.String(80))
 
 
 class Keyword(db.Model):
     __tablename__ = "keywords"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    api_id: Mapped[int] = mapped_column(db.Integer, unique=True)
-    name: Mapped[str] = mapped_column(db.String)
+    name: Mapped[str] = mapped_column(db.String(80))
 
 
 class Game(db.Model):
     __tablename__ = "games"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    api_id: Mapped[int] = mapped_column(db.Integer, unique=True)
-    name: Mapped[str] = mapped_column(db.String)
-    url: Mapped[str] = mapped_column(db.String)
-    summary: Mapped[Optional[str]] = mapped_column(db.String)
-    cover: Mapped[Optional[str]] = mapped_column(db.String)
+    name: Mapped[str] = mapped_column(db.String(80))
+    url: Mapped[str] = mapped_column(db.String(100))
+    summary: Mapped[Optional[str]] = mapped_column(db.String(4000))
+    cover: Mapped[Optional[str]] = mapped_column(db.String(100))
     total_rating: Mapped[Optional[int]] = mapped_column(db.Integer)
     genres: Mapped[List[Genre]] = relationship(secondary=game_genres)
     themes: Mapped[List[Theme]] = relationship(secondary=game_themes)
