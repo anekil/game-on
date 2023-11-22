@@ -1,5 +1,4 @@
 from requests import request
-from models import Game, Genre, Theme, Keyword
 from . import db
 
 
@@ -12,6 +11,9 @@ def fetch_games_data():
     }
     response = request("POST", url, headers=headers, data=payload)
     api_data = response.json()
+
+    from website.models import Genre, Theme, Keyword, Game
+
     for game_json in api_data:
         genre_ids = game_json.get("genres", [])
         genres = Genre.query.filter(Genre.id.in_(genre_ids)).all()
@@ -48,6 +50,8 @@ def fetch_items(items_name):
 
 
 def fetch_all_classification_data():
+    from website.models import Genre, Theme, Keyword
+
     genres = fetch_items("genres")
     for genre in genres:
         genre_data = Genre(

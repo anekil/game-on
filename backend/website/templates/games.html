@@ -2,12 +2,14 @@
 {% block content %}
     <h1>Games</h1>
     <h2>These are games for you {{ user.email.split('@')[0] }}!</h2>
+    <img src={{ "https:" + game.cover }}>
+    {{ game.name }}
+    {{ game.summary  }}
+
     <ul class="list-group">
-        {% for item in data %}
+        {% for genre in game.genres %}
             <li class="list-group-item">
-                <img src={{ "https:"+item.cover.url }}>
-                {{ item.name }}
-                <span class="badge bg-primary rounded-pill">{{ item.total_rating }}</span>
+                {{ genre.name }}
             </li>
         {% endfor %}
     </ul>

@@ -2,7 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
-from .scripts import fetch_all_classification_data, fetch_games_data
 
 db = SQLAlchemy()
 DB_NAME = "db"
@@ -23,8 +22,6 @@ def create_app():
 
     from .models import User
     create_database(app)
-    fetch_all_classification_data()
-    fetch_games_data()
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
@@ -34,10 +31,17 @@ def create_app():
     def load_user(id):
         return User.query.get(int(id))
 
+    from .scripts import fetch_all_classification_data, fetch_games_data
+    with app.app_context():
+        create_database(app)
+        fetch_all_classification_data()
+        fetch_games_data()
+
     return app
 
 
 def create_database(app):
-    if not path.exists('website/' + DB_NAME):
-        with app.app_context():
-            db.create_all()
+    #if not path.exists('website/' + DB_NAME):
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
