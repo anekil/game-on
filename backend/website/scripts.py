@@ -1,6 +1,8 @@
 from requests import request
+from sqlalchemy import select
+
 from . import db
-from .models import Game, Genre, Theme, Keyword, Mode, Platform
+from .models import Game, Genre, Theme, Keyword, Mode, Platform, Rating
 
 
 def fetch_games_data():
@@ -120,3 +122,17 @@ def get_all_games():
 
 def get_game(slug):
     return db.session.execute(db.select(Game).where(Game.slug.in_([slug]))).scalars().first()
+
+
+def get_game_rating(user, game):
+    return Rating.query.filter_by(user_id=user.id, game_id=game.id).first()
+
+
+def save_user_rating(user, game, rating):
+    rating = Rating(
+        rating=rating,
+        user_id=user.id,
+        game_id=game.id
+    )
+    db.session.add(rating)
+    db.session.commit()

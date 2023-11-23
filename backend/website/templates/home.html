@@ -2,4 +2,11 @@
 {% block content %}
     <h1>Home</h1>
     <h2>Hello {{ user.email.split('@')[0] }}!</h2>
+
+    <h2>Your ratings</h2>
+    <ul>
+    {% for rating in user.ratings %}
+        <li class="list-group-item">{{ rating.rating }} - {{ rating.game.name }}</li>
+    {% endfor %}
+    </ul>
 {% endblock %}
