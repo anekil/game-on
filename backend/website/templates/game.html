@@ -2,6 +2,7 @@
 {% block content %}
 
     <h1>{{ game.name }}</h1>
+    <img alt="..." src={{ "https:" + game.cover }}>
 
     {% if rating %}
     <h3>Your rating: {{ rating }}</h3>
@@ -11,7 +12,6 @@
         Rate this game
     </button>
 
-    <img alt="..." src={{ "https:" + game.cover }}>
     <p><a class="link-opacity-100" href={{ game.url }}>Link to games page</a></p>
     <h3>Rating: {{ game.total_rating }}</h3>
     <h3>Genres</h3>
@@ -64,31 +64,5 @@
         </div>
       </div>
     </div>
-
-
-    <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Launch demo modal
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 
 {% endblock %}
