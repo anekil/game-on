@@ -6,6 +6,7 @@ from sqlalchemy.orm import DeclarativeBase
 import pymysql
 pymysql.install_as_MySQLdb()
 
+
 class Base(DeclarativeBase):
     pass
 
@@ -30,6 +31,7 @@ def create_app():
 
     from .models import User, Rating, Game, Genre, Theme, Keyword
     with app.app_context():
+        db.drop_all()
         db.create_all()
 
     login_manager = LoginManager()
