@@ -31,7 +31,6 @@ def create_app():
 
     from .models import User, Rating, Game, Genre, Theme, Keyword
     with app.app_context():
-        db.drop_all()
         db.create_all()
 
     login_manager = LoginManager()

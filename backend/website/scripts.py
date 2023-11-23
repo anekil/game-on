@@ -116,3 +116,7 @@ def fetch_all_classification_data():
 
 def get_all_games():
     return db.session.execute(db.select(Game).order_by(Game.total_rating)).scalars()
+
+
+def get_game(slug):
+    return db.session.execute(db.select(Game).where(Game.slug.in_([slug]))).scalars().first()

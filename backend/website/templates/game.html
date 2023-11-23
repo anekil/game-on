@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <h1>{{ game.name }}</h1>
+    <img alt="..." src={{ "https:" + game.cover }}>
+    <p><a class="link-opacity-100" href={{ game.url }}>Link to games page</a></p>
+    <h3>Rating: {{ game.total_rating }}</h3>
+    <h3>Genres</h3>
+    {% for item in game.genres %}
+        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+    {% endfor %}
+    <h3>Themes</h3>
+    {% for item in game.themes %}
+        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+    {% endfor %}
+    <h3>Keywords</h3>
+    {% for item in game.keywords %}
+        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+    {% endfor %}
+    <h3>Modes</h3>
+    {% for item in game.modes %}
+        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+    {% endfor %}
+    <h3>Platforms</h3>
+    {% for item in game.platforms %}
+        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+    {% endfor %}
+    <h3>Summary</h3>
+    <p>{{ game.summary }}</p>
+    <h3>Screenshots</h3>
+    {% for item in game.screenshots %}
+        <img alt="..." src={{ "https:" + item }}>
+    {% endfor %}
+
+{% endblock %}
