@@ -5,7 +5,8 @@
     <img alt="..." src={{ "https:" + game.cover }}>
 
     {% if rating %}
-    <h3>Your rating: {{ rating }}</h3>
+        <h3>Your rating: {{ rating.rating }}</h3>
+        <button type="button" class="btn btn-primary" onclick="deleteRating({{ rating.id }})">Delete rating</button>
     {% endif %}
 
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">

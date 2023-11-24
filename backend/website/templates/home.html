@@ -6,7 +6,10 @@
     <h2>Your ratings</h2>
     <ul>
     {% for rating in user.ratings %}
-        <li class="list-group-item">{{ rating.rating }} - {{ rating.game.name }}</li>
+        <li class="list-group-item">
+            {{ rating.rating }} - {{ rating.game.name }}
+            <button type="button" class="btn-close" onclick="deleteRating({{ rating.id }})" ></button>
+        </li>
     {% endfor %}
     </ul>
 {% endblock %}

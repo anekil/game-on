@@ -1,10 +1,12 @@
-from flask import Blueprint, render_template, flash
+import json
+
+from flask import Blueprint, render_template, flash, request, jsonify
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import SelectField, SubmitField
 from wtforms.validators import DataRequired
 
-from .scripts import get_all_games, get_game, get_game_rating, save_user_rating
+from .scripts import get_all_games, get_game, get_game_rating, save_user_rating, delete_rating
 
 views = Blueprint('views', __name__)
 
@@ -61,10 +63,18 @@ class RatingForm(FlaskForm):
 def game_details(game_title):
     form = RatingForm()
     game = get_game(game_title)
-    rating = get_game_rating(current_user, game)
+    rating = get_game_rating(current_user.id, game.id)
 
     if form.validate_on_submit():
         rating = form.rating.data
-        save_user_rating(current_user, game, rating)
+        save_user_rating(current_user.id, game.id, rating)
         flash('Rating submitted successfully', category='success')
     return render_template("game.html", user=current_user, form=form, rating=rating, game=serialize_whole_game(game))
+
+
+@views.route('/rating-delete', methods=['POST'])
+@login_required
+def rating_delete():
+    data = json.loads(request.data)
+    delete_rating(data['ratingId'], current_user)
+    return jsonify({})
