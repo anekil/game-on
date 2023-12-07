@@ -42,8 +42,9 @@ def create_app():
         return User.query.get(int(id))
 
     from .scripts import fetch_all_classification_data, fetch_games_data
-    with app.app_context():
-        fetch_all_classification_data()
-        fetch_games_data()
+    #with app.app_context():
+    #    print("Fetching data...")
+    #    fetch_all_classification_data()
+    #    fetch_games_data()
 
     return app

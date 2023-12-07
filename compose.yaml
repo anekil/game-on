@@ -33,10 +33,10 @@ services:
       - MYSQL_USER=user
       - MYSQL_PASSWORD_FILE=/run/secrets/db-password
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --password=$$(cat /run/secrets/db-root-password)"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root --password=$$(cat /run/secrets/db-root-password)"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
     volumes:
       - db-data:/var/lib/mysql
     networks:
