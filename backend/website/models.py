@@ -86,6 +86,7 @@ class Platform(db.Model):
     __tablename__ = "platforms"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
     name: Mapped[str] = mapped_column(db.String(40))
+    platform_logo: Mapped[Optional[str]] = mapped_column(db.String(120))
 
 
 class Game(db.Model):
