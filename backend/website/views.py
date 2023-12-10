@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from wtforms import SelectField, SubmitField
 from wtforms.validators import DataRequired
 
+from .recommendation.recommendation import recommend_something, get_statistics
 from .scripts import get_all_games, get_game, get_game_rating, save_user_rating, delete_rating
 
 views = Blueprint('views', __name__)
@@ -78,3 +79,11 @@ def rating_delete():
     data = json.loads(request.data)
     delete_rating(data['ratingId'], current_user)
     return jsonify({})
+
+
+@views.route('/recommend')
+@login_required
+def recommend():
+    df = recommend_something()
+    #table = df.to_html(classes='table table-striped')
+    return render_template('index.html',  user=current_user, data=df)

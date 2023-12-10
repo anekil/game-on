@@ -3,6 +3,8 @@
     <h1>Home</h1>
     <h2>Hello {{ user.email.split('@')[0] }}!</h2>
 
+    <button type="button" class="btn-default" onclick="recommend()" >Recommend something</button>
+
     <h2>Your ratings</h2>
     <ul>
     {% for rating in user.ratings %}

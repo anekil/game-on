@@ -1,13 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Games</h1>
-    <h2>These are games for you {{ user.email.split('@')[0] }}!</h2>
+{#    <h2>These are games for you {{ user.email.split('@')[0] }}!</h2>#}
+    <h2>Rate some games so I can recommend you more!</h2>
+    <hr>
 
     <div class="row row-cols-1 row-cols-md-5 g-4">
     {% for game in data %}
           <div class="col">
               <div class="card h-100">
-                <img class="card-img-top" alt="..." src={{ "https:" + game.cover }}>
+                {% if game.cover %}
+                  <img class="card-img-top" alt="..." src={{ "https:" + game.cover }}>
+                {% endif %}
                 <div class="card-body">
                 <a href="{{ url_for('views.game_details', game_title=game.slug) }}">
                     <h5 class="card-title">{{ game.name }}</h5>

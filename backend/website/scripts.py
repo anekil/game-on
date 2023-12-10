@@ -5,7 +5,10 @@ from .models import Game, Rating
 
 
 def get_all_games():
-    return db.session.execute(db.select(Game).order_by(Game.total_rating)).scalars()
+    return (db.session.query(Game)
+            .filter(Game.hypes.isnot(None), Game.total_rating_count.isnot(None))
+            .order_by(Game.total_rating_count.desc())
+            .limit(100).all())
 
 
 def get_game(slug):
