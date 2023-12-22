@@ -6,7 +6,8 @@ wtforms
 psycopg2-binary
 requests
 cryptography
-pandas
+polars
 scikit-learn
 numpy
 matplotlib
+jupyter

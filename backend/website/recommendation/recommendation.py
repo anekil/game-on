@@ -15,16 +15,14 @@ def recommend_something():
              #.filter(Game.hypes.isnot(None), Game.total_rating_count.isnot(None))
              #.order_by(Game.total_rating_count.desc()).all())
     columns = ['id', 'name', 'summary', 'storyline', 'total_rating', 'total_rating_count', 'genres', 'themes', 'keywords', 'modes']
-    data = [(g.name, g.name, g.summary, g.storyline, g.total_rating, g.total_rating_count, [x.name for x in g.genres], [x.name for x in g.themes], [x.name for x in g.keywords], [x.name for x in g.modes]) for g in games]
-    df = pd.DataFrame(data, columns=columns)
-    df['description'] = df['summary'].fillna('') + df['storyline'].fillna('')
-    df['description'] = df['description'].replace('', pd.NA)
-    df = df.drop(['summary', 'storyline'], axis=1)
-    df = df.dropna()
-    print(df.shape)
-    print(df.dtypes)
+    # data = [(g.name, g.name, g.summary, g.storyline, g.total_rating, g.total_rating_count, [x.name for x in g.genres], [x.name for x in g.themes], [x.name for x in g.keywords], [x.name for x in g.modes]) for g in games]
+    # df = pd.DataFrame(data, columns=columns)
+    # df['description'] = df['summary'].fillna('') + df['storyline'].fillna('')
+    # df['description'] = df['description'].replace('', pd.NA)
+    # df = df.drop(['summary', 'storyline'], axis=1)
+    # df = df.dropna()
 
-    return ["hello", "????"]
+    return ["hello"]
 
     ## SIMPLEST RECOMMENDATION
     # df['summary'] = df['summary'].fillna('')

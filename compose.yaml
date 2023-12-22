@@ -24,6 +24,8 @@ services:
 
   database:
     image: mysql
+    ports:
+      - '3306:3306'
     secrets:
       - db-password
       - db-root-password
