@@ -38,7 +38,7 @@ services:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root --password=$$(cat /run/secrets/db-root-password)"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 50
     volumes:
       - db-data:/var/lib/mysql
     networks:

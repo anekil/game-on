@@ -10,7 +10,7 @@ def fetch_games_data():
     offset = 0
     while games_counter > 0:
         url = "https://api.igdb.com/v4/games"
-        payload = f"fields id, name, slug, url, summary, storyline, cover.url, total_rating, total_rating_count, hypes, genres, themes, keywords, game_modes, platforms, screenshots.url; limit 500; where total_rating > 50 & total_rating_count > 0 & category = 0; sort total_rating_count desc; offset {offset};"
+        payload = f"fields id, name, slug, url, summary, storyline, cover.url, total_rating, total_rating_count, hypes, genres, themes, keywords, game_modes, platforms, screenshots.url; limit 500; where total_rating_count > 0 & category = 0; sort total_rating_count desc; offset {offset};"
         headers = {
             'Authorization': 'Bearer 7uasv2bw3iyqjavppma1c5yntc1geo',
             'Client-ID': 't6vglpbbejgf6vm4ptt5q5lsrlros2',
@@ -32,13 +32,16 @@ def fetch_games_data():
                 platforms_ids = game_json.get("platforms", [])
                 platforms = Platform.query.filter(Platform.id.in_(platforms_ids)).all()
 
+                summary = str(game_json.get('summary')).replace("\n", "")
+                storyline = str(game_json.get('storyline')).replace("\n", "")
+
                 game_data = Game(
                     id=game_json['id'],
                     name=game_json['name'],
                     slug=game_json['slug'],
                     url=game_json['url'],
-                    summary=game_json.get('summary'),
-                    storyline=game_json.get('storyline'),
+                    summary=summary,
+                    storyline=storyline,
                     cover=game_json.get('cover', {}).get('url'),
                     total_rating=round(game_json.get('total_rating')),
                     total_rating_count=game_json.get('total_rating_count'),

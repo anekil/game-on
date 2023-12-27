@@ -5,9 +5,6 @@ RUN pip3 install PyMySQL
 
 WORKDIR app
 COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt && apt-get clean
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
-
-CMD python3 main.py
+CMD python3 main.pys
