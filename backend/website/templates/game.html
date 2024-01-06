@@ -1,49 +1,65 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <h1>{{ game.name }}</h1>
-    <img alt="..." src={{ "https:" + game.cover }}>
+    <div class="d-flex">
+        <div class="flex-grow-1 ms-3">
+            <h1>{{ game.name }}</h1>
+            <h3>Rating: {{ game.total_rating }}</h3>
+            {% if rating %}
+                <h3>Your rating: {{ rating.rating }}</h3>
+                <button type="button" class="btn btn-primary" onclick="deleteRating({{ rating.id }})">Delete rating</button>
+            {% endif %}
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">Rate this game</button>
+        </div>
+        <img class="flex-grow-*" style="max-width:230px; width: 100%; height: auto;" alt="cover" src={{ "https:" + game.cover }} sty>
+    </div>
 
-    {% if rating %}
-        <h3>Your rating: {{ rating.rating }}</h3>
-        <button type="button" class="btn btn-primary" onclick="deleteRating({{ rating.id }})">Delete rating</button>
-    {% endif %}
+    <div class="d-flex">
+      <div class="p-2 flex-fill">
+          <h3>Genres</h3>
+          {% for item in game.genres %}
+              <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+          {% endfor %}
+      </div>
+      <div class="p-2 flex-fill">
+          <h3>Themes</h3>
+          {% for item in game.themes %}
+              <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+          {% endfor %}
+      </div>
+    </div>
 
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">
-        Rate this game
-    </button>
-
-    <p><a class="link-opacity-100" href={{ game.url }}>Link to games page</a></p>
-    <h3>Rating: {{ game.total_rating }}</h3>
-    <h3>Genres</h3>
-    {% for item in game.genres %}
-        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
-    {% endfor %}
-    <h3>Themes</h3>
-    {% for item in game.themes %}
-        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
-    {% endfor %}
-    <h3>Keywords</h3>
-    {% for item in game.keywords %}
-        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
-    {% endfor %}
-    <h3>Modes</h3>
-    {% for item in game.modes %}
-        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
-    {% endfor %}
-    <h3>Platforms</h3>
-    {% for item in game.platforms %}
-        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
-    {% endfor %}
     <h3>Summary</h3>
     <p>{{ game.summary }}</p>
+    <p><a class="link-opacity-100" href={{ game.url }}>Link to games page</a></p>
+
     <h3>Screenshots</h3>
     {% for item in game.screenshots %}
         <img alt="..." src={{ "https:" + item }}>
     {% endfor %}
 
+    <div class="d-flex">
+      <div class="p-2 flex-fill">
+          <h3>Modes</h3>
+    {% for item in game.modes %}
+        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+    {% endfor %}
+      </div>
+      <div class="p-2 flex-fill">
+          <h3>Platforms</h3>
+          {% for item in game.platforms %}
+              <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+          {% endfor %}
+      </div>
+    </div>
 
-    <div class="modal fade" id="ratingModal" tabindex="-1"  aria-hidden="true">
+    <h3>Keywords</h3>
+    {% for item in game.keywords %}
+        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+    {% endfor %}
+
+
+    <div class="modal fade" id="ratingModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog  modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -53,13 +69,21 @@
           <div class="modal-body">
             <form method="post" action="{{ url_for('views.game_details', game_title=game.slug) }}">
                 {{ form.hidden_tag() }}
-                <div class="form-group">
-                    {{ form.rating(class="form-control") }}
+                <div class="form-group mb-3 starrating risingstar d-flex justify-content-center flex-row-reverse">
+                    {% for subfield in form.rating %}
+                        <tr>
+                            <td>{{ subfield }}</td>
+                            <td>{{ subfield.label }}</td>
+                        </tr>
+                    {% endfor %}
+
                     {% for error in form.rating.errors %}
                         <span style="color: red;">{{ error }}</span>
                     {% endfor %}
                 </div>
-                {{ form.submit(class="btn btn-primary") }}
+                <div class="text-center">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
             </form>
           </div>
         </div>

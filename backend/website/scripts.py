@@ -39,3 +39,32 @@ def delete_rating(rating_id, user):
         if rating.user_id == user.id:
             db.session.delete(rating)
             db.session.commit()
+
+def serialize_game(game):
+    return {
+        "id": game.id,
+        "name": game.name,
+        "slug": game.slug,
+        "cover": game.cover,
+        "genres": [item.name for item in game.genres],
+        "themes":  [item.name for item in game.themes],
+    }
+
+
+def serialize_whole_game(game):
+    return {
+        "id": game.id,
+        "name": game.name,
+        "slug": game.slug,
+        "cover": game.cover,
+        "url": game.url,
+        "summary": game.summary,
+        "total_rating": game.total_rating,
+        "hypes": game.hypes,
+        "genres": [item.name for item in game.genres],
+        "themes":  [item.name for item in game.themes],
+        "keywords": [item.name for item in game.keywords],
+        "modes": [item.name for item in game.modes],
+        "platforms": [item.name for item in game.platforms],
+        "screenshots": [item for item in game.screenshots]
+    }
