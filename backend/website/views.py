@@ -39,8 +39,8 @@ def game_details(game_title):
     rating = get_game_rating(current_user.id, game.id)
 
     if form.validate_on_submit():
-        rating = form.rating.data
-        save_user_rating(current_user.id, game.id, rating)
+        new_rating = form.rating.data
+        save_user_rating(current_user.id, game.id, new_rating)
         flash('Rating submitted successfully', category='success')
     return render_template("game.html", user=current_user, form=form, rating=rating, game=serialize_whole_game(game))
 

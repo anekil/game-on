@@ -11,26 +11,28 @@
             {% endif %}
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">Rate this game</button>
         </div>
-        <img class="flex-grow-*" style="max-width:230px; width: 100%; height: auto;" alt="cover" src={{ "https:" + game.cover }} sty>
+        <img class="flex-grow-*" style="max-width:230px; width: 100%; height: auto;" alt="cover" src={{ "https:" + game.cover }} >
     </div>
 
     <div class="d-flex">
       <div class="p-2 flex-fill">
           <h3>Genres</h3>
           {% for item in game.genres %}
-              <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+              <span class="rounded-pill text-bg-primary p-1 bg-opacity-75 m-1">{{ item }}</span>
           {% endfor %}
       </div>
       <div class="p-2 flex-fill">
           <h3>Themes</h3>
           {% for item in game.themes %}
-              <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+              <span class="rounded-pill text-bg-primary p-1 bg-opacity-75 m-1">{{ item }}</span>
           {% endfor %}
       </div>
     </div>
 
     <h3>Summary</h3>
     <p>{{ game.summary }}</p>
+    <h3>Storyline</h3>
+    <p>{{ game.storyline }}</p>
     <p><a class="link-opacity-100" href={{ game.url }}>Link to games page</a></p>
 
     <h3>Screenshots</h3>
@@ -41,21 +43,21 @@
     <div class="d-flex">
       <div class="p-2 flex-fill">
           <h3>Modes</h3>
-    {% for item in game.modes %}
-        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
-    {% endfor %}
+          {% for item in game.modes %}
+              <span class="rounded-pill text-bg-primary p-1 bg-opacity-75 m-1">{{ item }}</span>
+          {% endfor %}
       </div>
       <div class="p-2 flex-fill">
           <h3>Platforms</h3>
           {% for item in game.platforms %}
-              <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+               <span class="rounded-pill text-bg-primary p-1 bg-opacity-75 m-1">{{ item }}</span>
           {% endfor %}
       </div>
     </div>
 
     <h3>Keywords</h3>
     {% for item in game.keywords %}
-        <span class="badge rounded-pill text-bg-primary">{{ item }}</span>
+         <span class="rounded-pill text-bg-primary p-1 bg-opacity-25 m-1">{{ item }}</span>
     {% endfor %}
 
 

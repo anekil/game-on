@@ -59,6 +59,7 @@ def serialize_whole_game(game):
         "cover": game.cover,
         "url": game.url,
         "summary": game.summary,
+        "storyline": game.storyline,
         "total_rating": game.total_rating,
         "hypes": game.hypes,
         "genres": [item.name for item in game.genres],
