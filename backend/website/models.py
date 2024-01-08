@@ -108,3 +108,5 @@ class Game(db.Model):
     platforms: Mapped[List[Platform]] = relationship(secondary=game_platforms)
     screenshots: Mapped[Optional[JSON]] = mapped_column(db.JSON)
     ratings: Mapped[List["Rating"]] = relationship(back_populates="game")
+    similar_games: Mapped[Optional[JSON]] = mapped_column(db.JSON)
+    found_games: Mapped[Optional[JSON]] = mapped_column(db.JSON)

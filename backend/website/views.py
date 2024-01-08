@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired
 
 from .recommendation.recommendation import recommend_something
 from .scripts import get_all_games, get_game, get_game_rating, save_user_rating, delete_rating, serialize_game, \
-    serialize_whole_game
+    serialize_whole_game, get_get_game_by_id
 
 views = Blueprint('views', __name__)
 
@@ -37,12 +37,14 @@ def game_details(game_title):
     form = RatingForm()
     game = get_game(game_title)
     rating = get_game_rating(current_user.id, game.id)
+    similar_games = [serialize_game(get_get_game_by_id(game)) for game in game.similar_games]
 
     if form.validate_on_submit():
         new_rating = form.rating.data
         save_user_rating(current_user.id, game.id, new_rating)
         flash('Rating submitted successfully', category='success')
-    return render_template("game.html", user=current_user, form=form, rating=rating, game=serialize_whole_game(game))
+    return render_template("game.html", user=current_user, form=form, rating=rating,
+                           game=serialize_whole_game(game), similars=similar_games)
 
 
 @views.route('/rating-delete', methods=['POST'])

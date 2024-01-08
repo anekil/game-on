@@ -15,6 +15,10 @@ def get_game(slug):
     return db.session.execute(db.select(Game).where(Game.slug.in_([slug]))).scalars().first()
 
 
+def get_get_game_by_id(g_id):
+    return Game.query.get(g_id)
+
+
 def get_game_rating(user_id, game_id):
     return Rating.query.filter_by(user_id=user_id, game_id=game_id).first()
 
@@ -39,6 +43,7 @@ def delete_rating(rating_id, user):
         if rating.user_id == user.id:
             db.session.delete(rating)
             db.session.commit()
+
 
 def serialize_game(game):
     return {
@@ -67,5 +72,6 @@ def serialize_whole_game(game):
         "keywords": [item.name for item in game.keywords],
         "modes": [item.name for item in game.modes],
         "platforms": [item.name for item in game.platforms],
-        "screenshots": [item for item in game.screenshots]
+        "screenshots": [item for item in game.screenshots],
+        "similar_games": [item for item in game.similar_games]
     }

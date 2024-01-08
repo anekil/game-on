@@ -7,4 +7,4 @@ WORKDIR app
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt && apt-get clean
 
-CMD python3 main.pys
+CMD python3 main.py

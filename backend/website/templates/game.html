@@ -55,6 +55,32 @@
       </div>
     </div>
 
+    <h3>Similar games</h3>
+    <div class="row row-cols-1 row-cols-md-5 g-4 mb-3">
+    {% for game in similars %}
+          <div class="col">
+              <div class="card h-100">
+                {% if game.cover %}
+                  <img class="card-img-top" alt="..." src={{ "https:" + game.cover }}>
+                {% endif %}
+                <div class="card-body">
+                <a href="{{ url_for('views.game_details', game_title=game.slug) }}">
+                    <h5 class="card-title">{{ game.name }}</h5>
+                </a>
+                    <small class="text-body-secondary">
+                        {% for genre in game.genres %}
+                            {{ genre + ' ' }}
+                        {% endfor %}
+                        {% for theme in game.themes %}
+                            {{ theme + ' ' }}
+                        {% endfor %}
+                    </small>
+                </div>
+              </div>
+          </div>
+    {% endfor %}
+    </div>
+
     <h3>Keywords</h3>
     {% for item in game.keywords %}
          <span class="rounded-pill text-bg-primary p-1 bg-opacity-25 m-1">{{ item }}</span>

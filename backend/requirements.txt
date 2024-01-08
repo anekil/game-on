@@ -10,4 +10,3 @@ polars
 scikit-learn
 numpy
 matplotlib
-jupyter

@@ -10,7 +10,9 @@ def fetch_games_data():
     offset = 0
     while games_counter > 0:
         url = "https://api.igdb.com/v4/games"
-        payload = f"fields id, name, slug, url, summary, storyline, cover.url, total_rating, total_rating_count, hypes, genres, themes, keywords, game_modes, platforms, screenshots.url; limit 500; where total_rating_count > 0 & category = 0; sort total_rating_count desc; offset {offset};"
+        payload = (f"fields id, name, slug, url, summary, storyline, cover.url, total_rating, total_rating_count, "
+                   f"hypes, genres, themes, keywords, game_modes, platforms, screenshots.url, similar_games; limit 500;"
+                   f" where total_rating_count > 0 & category = 0; sort total_rating_count desc; offset {offset};")
         headers = {
             'Authorization': 'Bearer 7uasv2bw3iyqjavppma1c5yntc1geo',
             'Client-ID': 't6vglpbbejgf6vm4ptt5q5lsrlros2',
@@ -19,42 +21,42 @@ def fetch_games_data():
         api_data = response.json()
 
         games_counter = 0
+        game_info_dict = {}
         for game_json in api_data:
-            if Game.query.get(int(game_json['id'])) is None:
-                genre_ids = game_json.get("genres", [])
-                genres = Genre.query.filter(Genre.id.in_(genre_ids)).all()
-                theme_ids = game_json.get("themes", [])
-                themes = Theme.query.filter(Theme.id.in_(theme_ids)).all()
-                keywords_ids = game_json.get("keywords", [])
-                keywords = Keyword.query.filter(Keyword.id.in_(keywords_ids)).all()
-                modes_ids = game_json.get("game_modes", [])
-                modes = Mode.query.filter(Mode.id.in_(modes_ids)).all()
-                platforms_ids = game_json.get("platforms", [])
-                platforms = Platform.query.filter(Platform.id.in_(platforms_ids)).all()
+            game_id = int(game_json['id'])
 
-                summary = str(game_json.get('summary')).replace("\n", "")
-                storyline = str(game_json.get('storyline')).replace("\n", "")
+            game_info_dict[game_id] = {
+                'name': game_json['name'],
+                'slug': game_json['slug'],
+                'url': game_json['url'],
+                'summary': str(game_json.get('summary')).replace("\n", ""),
+                'storyline': str(game_json.get('storyline')).replace("\n", ""),
+                'cover': game_json.get('cover', {}).get('url'),
+                'total_rating': round(game_json.get('total_rating')),
+                'total_rating_count': game_json.get('total_rating_count'),
+                'hypes': game_json.get('hypes'),
+                'genres': Genre.query.filter(Genre.id.in_(game_json.get("genres", []))).all(),
+                'themes': Theme.query.filter(Theme.id.in_(game_json.get("themes", []))).all(),
+                'keywords': Keyword.query.filter(Keyword.id.in_(game_json.get("keywords", []))).all(),
+                'modes': Mode.query.filter(Mode.id.in_(game_json.get("game_modes", []))).all(),
+                'platforms': Platform.query.filter(Platform.id.in_(game_json.get("platforms", []))).all(),
+                'screenshots': [item["url"] for item in game_json.get("screenshots", [])],
+                'similar_games': game_json.get("similar_games", []),
+            }
 
-                game_data = Game(
-                    id=game_json['id'],
-                    name=game_json['name'],
-                    slug=game_json['slug'],
-                    url=game_json['url'],
-                    summary=summary,
-                    storyline=storyline,
-                    cover=game_json.get('cover', {}).get('url'),
-                    total_rating=round(game_json.get('total_rating')),
-                    total_rating_count=game_json.get('total_rating_count'),
-                    hypes=game_json.get('hypes'),
-                    genres=genres,
-                    themes=themes,
-                    keywords=keywords,
-                    modes=modes,
-                    platforms=platforms,
-                    screenshots=[item["url"] for item in game_json.get("screenshots", [])]
-                )
-                db.session.add(game_data)
+        for game_id, game_info in game_info_dict.items():
+            existing_game = Game.query.get(game_id)
+
+            if existing_game:
+                for key, value in game_info.items():
+                    setattr(existing_game, key, value)
+                db.session.merge(existing_game)
                 games_counter += 1
+            else:
+                new_game = Game(id=game_id, **game_info)
+                db.session.add(new_game)
+                games_counter += 1
+
         db.session.commit()
         offset += 500
         all_games_counter += games_counter
@@ -121,7 +123,8 @@ def fetch_all_classification_data():
             modes_counter += 1
 
     platforms_counter = 0
-    for item in fetch_items("platforms", " fields platform_logo.url; where id = (39, 34, 6, 3, 14, 163, 162, 11, 7, 41);"):
+    for item in fetch_items("platforms", " fields platform_logo.url; "
+                                         "where id = (39, 34, 6, 3, 14, 163, 162, 11, 7, 41);"):
         if db.session.get(Platform, item['id']) is None:
             data = Platform(
                 id=item['id'],
@@ -131,4 +134,5 @@ def fetch_all_classification_data():
             db.session.add(data)
             platforms_counter += 1
     db.session.commit()
-    print(f'Successfully added {genres_counter} genres, {themes_counter} themes, {all_keywords_counter} keywords, {modes_counter} modes and {platforms_counter} platforms')
+    print(f'Successfully added {genres_counter} genres, {themes_counter} themes, {all_keywords_counter} keywords, '
+          f'{modes_counter} modes and {platforms_counter} platforms')
