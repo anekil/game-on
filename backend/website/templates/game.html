@@ -58,7 +58,8 @@
     <h3>Similar games</h3>
     <div class="row row-cols-1 row-cols-md-5 g-4 mb-3">
     {% for game in similars %}
-          <div class="col">
+        {% if game %}
+            <div class="col">
               <div class="card h-100">
                 {% if game.cover %}
                   <img class="card-img-top" alt="..." src={{ "https:" + game.cover }}>
@@ -78,6 +79,7 @@
                 </div>
               </div>
           </div>
+        {% endif %}
     {% endfor %}
     </div>
 

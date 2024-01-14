@@ -37,7 +37,7 @@ def game_details(game_title):
     form = RatingForm()
     game = get_game(game_title)
     rating = get_game_rating(current_user.id, game.id)
-    similar_games = [serialize_game(get_get_game_by_id(game)) for game in game.similar_games]
+    similar_games = [serialize_game(get_get_game_by_id(game)) if get_get_game_by_id(game) else None for game in game.similar_games]
 
     if form.validate_on_submit():
         new_rating = form.rating.data
