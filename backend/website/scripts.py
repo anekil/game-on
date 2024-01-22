@@ -5,18 +5,26 @@ from .models import Game, Rating
 
 
 def get_all_games():
+    return db.session.query(Game).all()
+
+
+def get_sorted_games(limit):
     return (db.session.query(Game)
-            .filter(Game.hypes.isnot(None), Game.total_rating_count.isnot(None))
+            .filter(Game.total_rating_count.isnot(None))
             .order_by(Game.total_rating_count.desc())
-            .limit(100).all())
+            .limit(limit).all())
 
 
 def get_game(slug):
     return db.session.execute(db.select(Game).where(Game.slug.in_([slug]))).scalars().first()
 
 
-def get_get_game_by_id(g_id):
-    return Game.query.get(g_id)
+def get_game_by_id(id):
+    return Game.query.get(id)
+
+
+def get_games(ids):
+    return Game.query.filter(Game.id.in_(ids)).all()
 
 
 def get_game_rating(user_id, game_id):
