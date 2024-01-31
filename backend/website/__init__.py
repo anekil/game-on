@@ -41,7 +41,7 @@ def create_app():
     def load_user(id):
         return User.query.get(int(id))
 
-    # from .fetching import fetch_all_classification_data, fetch_games_data
+    from .fetching import fetch_all_classification_data, fetch_games_data
     # with app.app_context():
     #     print("Fetching data...")
     #     fetch_all_classification_data()

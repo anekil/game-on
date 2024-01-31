@@ -10,5 +10,6 @@ polars
 scikit-learn
 numpy
 matplotlib
-keras
 tensorflow
+keras
+nltk

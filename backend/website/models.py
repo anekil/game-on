@@ -109,4 +109,4 @@ class Game(db.Model):
     screenshots: Mapped[Optional[JSON]] = mapped_column(db.JSON)
     ratings: Mapped[List["Rating"]] = relationship(back_populates="game")
     similar_games: Mapped[Optional[JSON]] = mapped_column(db.JSON)
-    found_games: Mapped[Optional[JSON]] = mapped_column(db.JSON)
+    recommendation_form: Mapped[Optional[str]] = mapped_column(db.String(8000))

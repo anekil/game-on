@@ -27,6 +27,20 @@ def get_games(ids):
     return Game.query.filter(Game.id.in_(ids)).all()
 
 
+def get_liked_games(user_id):
+    return get_games_by_rating(user_id, 1)
+
+
+def get_disliked_games(user_id):
+    return get_games_by_rating(user_id, 0)
+
+
+def get_games_by_rating(user_id, rating):
+    ratings = Rating.query.filter_by(user_id=user_id)
+    liked_games = [r.game for r in ratings if r.rating == rating]
+    return liked_games
+
+
 def get_game_rating(user_id, game_id):
     return Rating.query.filter_by(user_id=user_id, game_id=game_id).first()
 

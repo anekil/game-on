@@ -1,7 +1,18 @@
 from requests import request
-
+import time
 from . import db
 from .models import Game, Genre, Theme, Keyword, Mode, Platform
+from .secrets import TOKEN, CLIENT_ID
+
+
+def clean_and_join(row):
+    words = sorted(["".join(filter(str.isalpha, i)) for i in row])
+    words = ' '.join([w for w in words if len(w) > 3])
+    return words.strip()
+
+
+def extract_name(items):
+    return [x.name for x in items]
 
 
 def fetch_games_data():
@@ -9,13 +20,14 @@ def fetch_games_data():
     games_counter = 1
     offset = 0
     while games_counter > 0:
+        time.sleep(0.5)
         url = "https://api.igdb.com/v4/games"
         payload = (f"fields id, name, slug, url, summary, storyline, cover.url, total_rating, total_rating_count, "
                    f"hypes, genres, themes, keywords, game_modes, platforms, screenshots.url, similar_games; limit 500;"
                    f" where total_rating_count > 0 & category = 0; sort total_rating_count desc; offset {offset};")
         headers = {
-            'Authorization': 'Bearer 7uasv2bw3iyqjavppma1c5yntc1geo',
-            'Client-ID': 't6vglpbbejgf6vm4ptt5q5lsrlros2',
+            'Authorization': f'Bearer {TOKEN}',
+            'Client-ID': CLIENT_ID,
         }
         response = request("POST", url, headers=headers, data=payload)
         api_data = response.json()
@@ -24,6 +36,10 @@ def fetch_games_data():
         game_info_dict = {}
         for game_json in api_data:
             game_id = int(game_json['id'])
+
+            genres = Genre.query.filter(Genre.id.in_(game_json.get("genres", []))).all()
+            themes = Theme.query.filter(Theme.id.in_(game_json.get("themes", []))).all()
+            keywords = Keyword.query.filter(Keyword.id.in_(game_json.get("keywords", []))).all()
 
             game_info_dict[game_id] = {
                 'name': game_json['name'],
@@ -35,13 +51,14 @@ def fetch_games_data():
                 'total_rating': round(game_json.get('total_rating')),
                 'total_rating_count': game_json.get('total_rating_count'),
                 'hypes': game_json.get('hypes'),
-                'genres': Genre.query.filter(Genre.id.in_(game_json.get("genres", []))).all(),
-                'themes': Theme.query.filter(Theme.id.in_(game_json.get("themes", []))).all(),
-                'keywords': Keyword.query.filter(Keyword.id.in_(game_json.get("keywords", []))).all(),
+                'genres': genres,
+                'themes': themes,
+                'keywords': keywords,
                 'modes': Mode.query.filter(Mode.id.in_(game_json.get("game_modes", []))).all(),
                 'platforms': Platform.query.filter(Platform.id.in_(game_json.get("platforms", []))).all(),
                 'screenshots': [item["url"] for item in game_json.get("screenshots", [])],
                 'similar_games': game_json.get("similar_games", []),
+                'recommendation_form': clean_and_join(extract_name(genres) + extract_name(themes) + extract_name(keywords))
             }
 
         for game_id, game_info in game_info_dict.items():
@@ -64,11 +81,12 @@ def fetch_games_data():
 
 
 def fetch_items(items_name, filters="", offset=0):
+    time.sleep(0.25)
     url = "https://api.igdb.com/v4/" + items_name
     payload = f"fields id, name; limit 500; offset {offset};" + filters
     headers = {
-        'Authorization': 'Bearer 7uasv2bw3iyqjavppma1c5yntc1geo',
-        'Client-ID': 't6vglpbbejgf6vm4ptt5q5lsrlros2',
+        'Authorization': f'Bearer {TOKEN}',
+        'Client-ID': CLIENT_ID
     }
     response = request("POST", url, headers=headers, data=payload)
     return response.json()
@@ -77,7 +95,7 @@ def fetch_items(items_name, filters="", offset=0):
 def fetch_all_classification_data():
     genres_counter = 0
     for item in fetch_items("genres"):
-        if Genre.query.get(int(item['id'])) is None:
+        if db.session.get(Genre, item['id']) is None:
             data = Genre(
                 id=int(item['id']),
                 name=item['name'],
