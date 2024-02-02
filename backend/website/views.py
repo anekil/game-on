@@ -3,12 +3,12 @@ import json
 from flask import Blueprint, render_template, flash, request, jsonify
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, RadioField
+from wtforms import SubmitField, RadioField, StringField
 from wtforms.validators import DataRequired
 
 from .recommendation.recommendation import recommend_something
 from .scripts import get_game, get_game_rating, save_user_rating, delete_rating, serialize_game, \
-    serialize_whole_game, get_game_by_id, get_sorted_games
+    serialize_whole_game, get_game_by_id, get_sorted_games, get_games_by_name
 
 views = Blueprint('views', __name__)
 
@@ -16,18 +16,27 @@ views = Blueprint('views', __name__)
 @views.route('/')
 @login_required
 def home():
-    recommendations = [serialize_game(game) for game in recommend_something()]
+    recommendations = [serialize_game(game) for game in recommend_something(current_user.id)]
     return render_template("home.html", user=current_user, data=recommendations)
 
 
-@views.route('/games')
+class QuickSearchForm(FlaskForm):
+    name = StringField('Search')
+    submit = SubmitField('Submit')
+
+@views.route('/games', methods=['GET', 'POST'])
 @login_required
 def browse_games():
-    return render_template("browse.html", user=current_user, data=[serialize_game(game) for game in get_sorted_games(100)])
+    search = QuickSearchForm()
+    if request.method == 'POST':
+        return render_template("browse.html", user=current_user, search=search,
+                               data=[serialize_game(game) for game in get_games_by_name(search.name.data)])
+    return render_template("browse.html", user=current_user, search=search,
+                           data=[serialize_game(game) for game in get_sorted_games(1000)])
 
 
 class RatingForm(FlaskForm):
-    rating = RadioField('Rating', choices=[(x, str(x)) for x in range(1, 6).__reversed__()], coerce=int, validators=[DataRequired()])
+    rating = RadioField('Rating', choices=[(x, str(x)) for x in range(0, 2).__reversed__()], coerce=int, validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 

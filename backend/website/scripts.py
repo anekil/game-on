@@ -27,6 +27,10 @@ def get_games(ids):
     return Game.query.filter(Game.id.in_(ids)).all()
 
 
+def get_games_by_name(name):
+    return Game.query.filter(Game.name.like('%' + name + '%')).all()
+
+
 def get_liked_games(user_id):
     return get_games_by_rating(user_id, 1)
 

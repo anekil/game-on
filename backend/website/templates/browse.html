@@ -3,6 +3,23 @@
     <h1>Rate some games so I can recommend you more!</h1>
     <hr>
 
+    <div class="sticky-top mb-3 p-1">
+    <form method="post" action="{{ url_for('views.browse_games', search=search) }}">
+        {{ search.hidden_tag() }}
+        <div class="d-flex justify-content-center flex-row-reverse">
+            {{ search.name }}
+            {% if search.name.errors %}
+                {% for error in search.rating.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+            <div class="text-center">
+                {{ search.submit(class="btn btn-primary") }}
+            </div>
+        </div>
+    </form>
+    </div>
+
     <div class="row row-cols-1 row-cols-md-5 g-4">
     {% for game in data %}
           <div class="col">
