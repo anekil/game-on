@@ -1,54 +1,31 @@
 import json
-
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers, models
 
 print('Fetching...')
 
-with open('/mnt/c/Users/agata/Documents/quest-finder/backend/website/recommendation/training_data_pairs_shuffled.json', 'r') as f:
+with open('/home/aneta/Documents/quest-finder/backend/website/recommendation/training_data_pairs_shuffled.json', 'r') as f:
     loaded_data = json.load(f)
 
 print('Loaded')
+label_list = []
+anchor_list = []
+game_list = []
 
+for entry in loaded_data:
+    label_list.append(entry['label'])
+    #anchor_list.append(f"{entry['anchor']['features']} {entry['anchor']['description']}")
+    #game_list.append(f"{entry['game']['features']} {entry['game']['description']}")
+    anchor_list.append(f"{entry['anchor']['features']}")
+    game_list.append(f"{entry['game']['features']}")
 
-def extract_features_and_labels(data):
-    features_anchor = [entry['anchor']['features'] for entry in data]
-    features_game = [entry['game']['features'] for entry in data]
-    labels = [entry['label'] for entry in data]
-    return (features_anchor, features_game, labels)
-
-
-features_anchor, features_game, labels = extract_features_and_labels(loaded_data)
-
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(features_anchor + features_game)
-vocab_size = len(tokenizer.word_index) + 1
-max_sequence_length = max(
-    max(len(seq) for seq in features_anchor),
-    max(len(seq) for seq in features_game),
-)
-
-print('1')
-
-def tokenize_and_pad(sequences):
-    tokenized_sequences = tokenizer.texts_to_sequences(sequences)
-    padded_sequences = pad_sequences(tokenized_sequences, maxlen=max_sequence_length, padding='post')
-    return padded_sequences
-
-
-features_anchor = tokenize_and_pad(features_anchor)
-features_game = tokenize_and_pad(features_game)
-
-print('2')
+from sklearn.model_selection import train_test_split
 
 train_anchor, temp_anchor, train_game, temp_game, train_labels, temp_labels = train_test_split(
-    features_anchor,
-    features_game,
-    labels,
+    anchor_list,
+    game_list,
+    label_list,
     test_size=0.8, random_state=42)
 val_anchor, test_anchor, val_game, test_game, val_labels, test_labels = train_test_split(
     temp_anchor,
@@ -56,64 +33,97 @@ val_anchor, test_anchor, val_game, test_game, val_labels, test_labels = train_te
     temp_labels,
     test_size=0.5, random_state=42)
 
-print('Data ready')
+MAX_LENGTH = max([len(d) for d in anchor_list + game_list])
+print(MAX_LENGTH)
+NUM_CLASSES = 1
+MAX_TOKENS = 10000
 
+anchor_input = tf.keras.Input(shape=(1,), name='anchor', dtype=tf.string)
+game_input = tf.keras.Input(shape=(1,), name='game', dtype=tf.string)
 
-def build_siamese_network(input_shape, vocab_size):
-    model = models.Sequential()
-    model.add(layers.Embedding(input_dim=vocab_size, output_dim=128, input_length=input_shape))
-    model.add(layers.LSTM(64))
-    model.add(layers.Dense(32, activation='relu'))
-    model.add(layers.Dropout(0.5))
-    model.add(layers.Dense(16, activation='relu'))
-    return model
+vectorize_layer = layers.TextVectorization(max_tokens=MAX_TOKENS, output_mode='int')
+vectorize_layer.adapt(anchor_list)
+A_vectorized = vectorize_layer(anchor_input)
+B_vectorized = vectorize_layer(game_input)
 
+embedding_layer = layers.Embedding(input_dim=MAX_TOKENS, output_dim=128)
+A_embedded = embedding_layer(A_vectorized)
+B_embedded = embedding_layer(B_vectorized)
 
-# Define the input shapes
-input_shape = max_sequence_length
+shared_lstm = layers.LSTM(64)
+A_lstm = shared_lstm(A_embedded)
+B_lstm = shared_lstm(B_embedded)
 
-# Create the Siamese network
-anchor_input = tf.keras.Input(shape=(input_shape,), name='anchor')
-game_input = tf.keras.Input(shape=(input_shape,), name='game')
+dense1 = layers.Dense(
+    units=64,
+    activation='relu')
+A_dense = dense1(A_lstm)
+B_dense = dense1(B_lstm)
 
-siamese_network = build_siamese_network(input_shape, vocab_size)
+dropout = layers.Dropout(0.5)
+A_drop = dropout(A_dense)
+B_drop = dropout(B_dense)
 
-# Generate the encodings (feature vectors) for the anchor and game
-encoded_anchor = siamese_network(anchor_input)
-encoded_game = siamese_network(game_input)
+dense2 = layers.Dense(
+    units=16,
+    activation='relu')
+A_output = dense2(A_drop)
+B_output = dense2(B_drop)
 
-# Calculate the similarity between the anchor and game
-similarity = layers.Dot(axes=1, normalize=True)([encoded_anchor, encoded_game])
+merged = layers.concatenate(
+    [A_output, B_output],
+    axis=-1)
 
-# Create the Siamese model
-siamese_model = tf.keras.Model(inputs=[anchor_input, game_input], outputs=similarity)
+dense3 = layers.Dense(
+    units=NUM_CLASSES,
+    activation='sigmoid')
 
-# Compile the Siamese model with binary crossentropy loss
-# custom_adam = Adam(learning_rate=0.001)
-siamese_model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+predictions = dense3(merged)
 
-# Print the model summary
-print(siamese_model.summary())
+siamese_model = models.Model(inputs=[anchor_input, game_input],
+                                  outputs=predictions,
+                                  name='siamese_model')
 
-print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+#custom_adam = Adam(learning_rate=0.01)
+siamese_model.compile(optimizer='adam',
+                      loss='binary_crossentropy',
+                      metrics=['accuracy'])
 
-# Train the Siamese model with your padded_sequences_anchor, padded_sequences_game, and labels
-siamese_model.fit(
-    [train_anchor, train_game],
+siamese_model.summary()
+
+history = siamese_model.fit(
+    [np.array(train_anchor), np.array(train_game)],
     np.array(train_labels),
-    epochs=10,
-    batch_size=128,
-    # validation_split=0.2,
+    epochs=15,
+    batch_size=64,
     use_multiprocessing=True,
     workers=10,
-    validation_data=([val_anchor, val_game], np.array(val_labels))
+    shuffle=True,
+    validation_data=([np.array(val_anchor), np.array(val_game)], np.array(val_labels))
 )
 
-siamese_model.save('siamese_model.keras')
+siamese_model.save('siamese_model_v4.keras')
 
-# Evaluate the model on the test set
+from matplotlib import pyplot as plt
+
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Model Accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
+plt.show()
+
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model Loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
+plt.show()
+
 test_loss, test_accuracy = siamese_model.evaluate(
-    (test_anchor, test_game),
+    (np.array(test_anchor), np.array(test_game)),
     np.array(test_labels),
 )
 print(f'Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy * 100:.2f}%')
