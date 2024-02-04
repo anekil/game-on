@@ -21,25 +21,62 @@ footer {
     margin-top: 30px;
 }
 
-.starrating > input {display: none;}  /* Remove radio buttons */
 
-.starrating > label:before {
-  content: "\f005"; /* Star */
-  margin: 2px;
-  font-size: 3em;
-  font-family: FontAwesome;
-  display: inline-block;
+input[type="radio"] {
+    display: none;
 }
 
-.starrating > label
-{
-  color: #a69e9e; /* Start color when not clicked */
+.thumbs-down:before {
+    content: "\f165"; /* Thumbs down icon */
+    margin: 2px;
+    font-size: 3em;
+    font-family: FontAwesome;
+    display: inline-block;
+    color: #888; /* Default color */
 }
 
-.starrating > input:checked ~ label
-{ color: #ffca08 ; } /* Set yellow color when star checked */
+.thumbs-up:before {
+    content: "\f164"; /* Thumbs up icon */
+    margin: 2px;
+    font-size: 3em;
+    font-family: FontAwesome;
+    display: inline-block;
+    color: #888; /* Default color */
+}
 
-.starrating > input:hover ~ label
-{ color: #ffca08 ;  } /* Set yellow color when star hover */
+input[type="radio"]:checked + label:before {
+    color: #0d6efd;
+}
 
+.thumbs-up-item::before {
+    content: "\f164"; /* Thumbs up icon */
+    font-family: FontAwesome;
+    margin-right: 5px; /* Add some spacing between the icon and text */
+}
 
+.thumbs-down-item::before {
+    content: "\f165"; /* Thumbs down icon */
+    font-family: FontAwesome;
+    margin-right: 5px; /* Add some spacing between the icon and text */
+}
+
+/*.starrating > input {display: none;}  !* Remove radio buttons *!*/
+
+/*.starrating > label:before {*/
+/*  content: "\f164";*/
+/*  margin: 2px;*/
+/*  font-size: 3em;*/
+/*  font-family: FontAwesome;*/
+/*  display: inline-block;*/
+/*}*/
+
+/*.starrating > label*/
+/*{*/
+/*  color: #a69e9e; !* Start color when not clicked *!*/
+/*}*/
+
+/*.starrating > input:checked ~ label*/
+/*{ color: #ffca08 ; } !* Set yellow color when star checked *!*/
+
+/*.starrating > input:hover ~ label*/
+/*{ color: #ffca08 ;  } !* Set yellow color when star hover *!*/

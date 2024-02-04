@@ -33,17 +33,38 @@
         <h2>Rate some more games to see recommendations</h2>
     {% endif %}
 
-
+    {% if ratings %}
     <h2>Your ratings</h2>
-    <ul>
-    {% for rating in user.ratings %}
-        <li class="list-group-item">
-            {{ rating.rating }} -
-            <a href="{{ url_for('views.game_details', game_title=rating.game.slug) }}">
-                {{ rating.game.name }}
-            </a>
-            <button type="button" class="btn-close" onclick="deleteRating({{ rating.id }})" ></button>
-        </li>
-    {% endfor %}
-    </ul>
+    <div class="row">
+    <div class="col">
+         <ul class="list-group">
+            {% for rating in user.ratings %}
+                {% if rating.rating == 1 %}
+                    <li class="list-group-item thumbs-up-item d-flex">
+                        <a class="flex-grow-1" href="{{ url_for('views.game_details', game_title=rating.game.slug) }}">
+                            {{ rating.game.name }}
+                        </a>
+                        <button type="button" class="btn-close p-0" onclick="deleteRating({{ rating.id }})"></button>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col">
+        <ul class="list-group">
+            {% for rating in user.ratings %}
+                {% if rating.rating == 0 %}
+                    <li class="list-group-item thumbs-down-item d-flex">
+                        <a class="flex-grow-1" href="{{ url_for('views.game_details', game_title=rating.game.slug) }}">
+                            {{ rating.game.name }}
+                        </a>
+                        <button type="button" class="btn-close p-0" onclick="deleteRating({{ rating.id }})"></button>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    </div>
+    {% endif %}
+
 {% endblock %}

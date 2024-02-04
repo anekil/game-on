@@ -3,7 +3,7 @@ import json
 from flask import Blueprint, render_template, flash, request, jsonify
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, RadioField, StringField
+from wtforms import SubmitField, RadioField, StringField, BooleanField
 from wtforms.validators import DataRequired
 
 from .recommendation.recommendation import recommend_something
@@ -24,6 +24,7 @@ class QuickSearchForm(FlaskForm):
     name = StringField('Search')
     submit = SubmitField('Submit')
 
+
 @views.route('/games', methods=['GET', 'POST'])
 @login_required
 def browse_games():
@@ -36,8 +37,7 @@ def browse_games():
 
 
 class RatingForm(FlaskForm):
-    rating = RadioField('Rating', choices=[(x, str(x)) for x in range(0, 2).__reversed__()], coerce=int, validators=[DataRequired()])
-    submit = SubmitField('Submit')
+    rating = RadioField('Rating', choices=[('0', 'Thumbs Down'), ('1', 'Thumbs Up')])
 
 
 @views.route('/games/<game_title>', methods=['GET', 'POST'])
@@ -52,6 +52,7 @@ def game_details(game_title):
         new_rating = form.rating.data
         save_user_rating(current_user.id, game.id, new_rating)
         flash('Rating submitted successfully', category='success')
+        rating = get_game_rating(current_user.id, game.id)
     return render_template("game.html", user=current_user, form=form, rating=rating,
                            game=serialize_whole_game(game), similars=similar_games)
 

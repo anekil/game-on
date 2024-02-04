@@ -14,7 +14,6 @@ auth = Blueprint('auth', __name__)
 class LoginForm(FlaskForm):
     email = EmailField('Email Address', validators=[InputRequired(), Length(min=4, max=20)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=6, max=20)])
-    confirm = PasswordField('Confirm password', validators=[InputRequired(), Length(min=6, max=20)])
 
 
 @auth.route('/login', methods=['GET', 'POST'])

@@ -6,28 +6,35 @@
             <h1>{{ game.name }}</h1>
             <h3>Rating: {{ game.total_rating }}</h3>
             {% if rating %}
-                <h3>Your rating: {{ rating.rating }}</h3>
+                <h3>You {% if rating.rating == 1 %}like{% else %}dislike{% endif %} this game</h3>
                 <button type="button" class="btn btn-primary" onclick="deleteRating({{ rating.id }})">Delete rating</button>
             {% endif %}
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">Rate this game</button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">Rate game</button>
+            <div class="d-flex">
+              <div class="p-2 flex-fill">
+                  <h3>Genres</h3>
+                  {% for item in game.genres %}
+                      <span class="rounded-pill text-bg-primary p-1 bg-opacity-75 m-1">{{ item }}</span>
+                  {% endfor %}
+              </div>
+              <div class="p-2 flex-fill">
+                  <h3>Themes</h3>
+                  {% for item in game.themes %}
+                      <span class="rounded-pill text-bg-primary p-1 bg-opacity-75 m-1">{{ item }}</span>
+                  {% endfor %}
+              </div>
+            </div>
+
+{#            {% if rating %}#}
+{#                #}
+{#                <button type="button" class="btn btn-primary" onclick="deleteRating({{ rating.id }})">Delete rating</button>#}
+{#            {% endif %}#}
+{#            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">Rate this game</button>#}
         </div>
         <img class="flex-grow-*" style="max-width:230px; width: 100%; height: auto;" alt="cover" src={{ "https:" + game.cover }} >
     </div>
 
-    <div class="d-flex">
-      <div class="p-2 flex-fill">
-          <h3>Genres</h3>
-          {% for item in game.genres %}
-              <span class="rounded-pill text-bg-primary p-1 bg-opacity-75 m-1">{{ item }}</span>
-          {% endfor %}
-      </div>
-      <div class="p-2 flex-fill">
-          <h3>Themes</h3>
-          {% for item in game.themes %}
-              <span class="rounded-pill text-bg-primary p-1 bg-opacity-75 m-1">{{ item }}</span>
-          {% endfor %}
-      </div>
-    </div>
+
 
     <h3>Summary</h3>
     <p>{{ game.summary }}</p>
@@ -97,24 +104,41 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form method="post" action="{{ url_for('views.game_details', game_title=game.slug) }}">
+            <form method="POST" class="text-center">
                 {{ form.hidden_tag() }}
-                <div class="form-group mb-3 starrating risingstar d-flex justify-content-center flex-row-reverse">
-                    {% for subfield in form.rating %}
-                        <tr>
-                            <td>{{ subfield }}</td>
-                            <td>{{ subfield.label }}</td>
-                        </tr>
-                    {% endfor %}
-
-                    {% for error in form.rating.errors %}
-                        <span style="color: red;">{{ error }}</span>
-                    {% endfor %}
+                <div class="form-group">
+                    <label>Rate this item:</label>
+                    <div>
+                        <input type="radio" name="rating" id="thumbs-down" value="0">
+                        <label for="thumbs-down" class="rating thumbs-down"></label>
+                        <input type="radio" name="rating" id="thumbs-up" value="1">
+                        <label for="thumbs-up" class="rating thumbs-up"></label>
+                    </div>
                 </div>
-                <div class="text-center">
-                    {{ form.submit(class="btn btn-primary") }}
+                <div class="d-flex justify-content-around">
+                                    <button type="submit" class="btn btn-primary">Submit Rating</button>
+                <button type="button" class="btn btn-danger" id="remove-rating">Remove Rating</button>
                 </div>
             </form>
+
+{#            <form method="post" action="{{ url_for('views.game_details', game_title=game.slug) }}">#}
+{#                {{ form.hidden_tag() }}#}
+{#                <div class="form-group mb-3 starrating risingstar d-flex justify-content-center flex-row-reverse">#}
+{#                    {% for subfield in form.rating %}#}
+{#                        <tr>#}
+{#                            <td>{{ subfield }}</td>#}
+{#                            <td>{{ subfield.label }}</td>#}
+{#                        </tr>#}
+{#                    {% endfor %}#}
+{##}
+{#                    {% for error in form.rating.errors %}#}
+{#                        <span style="color: red;">{{ error }}</span>#}
+{#                    {% endfor %}#}
+{#                </div>#}
+{#                <div class="text-center">#}
+{#                    {{ form.submit(class="btn btn-primary") }}#}
+{#                </div>#}
+{#            </form>#}
           </div>
         </div>
       </div>

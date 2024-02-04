@@ -5,7 +5,7 @@ from .models import Game, Rating
 
 
 def get_all_games():
-    return db.session.query(Game).all()
+    return db.session.query(Game).filter(Game.total_rating_count > 17).all()
 
 
 def get_sorted_games(limit):
