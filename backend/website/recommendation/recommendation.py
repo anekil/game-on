@@ -26,17 +26,21 @@ def recommend_something(user_id):
     ids_to_drop += [g.id for g in disliked_games]
     df = df.filter(~pl.col('id').is_in(ids_to_drop))
 
-    model = load_model('website/recommendation/siamese_model_v4.keras')
+    model = load_model('website/recommendation/siamese_model_v3.keras')
 
     recommendations = []
     THRESHOLD = 0.9999
     iterations = 0
 
-    for anchor in liked_df.iter_rows(named=True):
+    for _ in range(5):
+        if liked_df.is_empty():
+            break
+        anchor = liked_df.sample(1)
+        liked_df = liked_df.filter(pl.col('id') != anchor['id'])
         similarity = 0
         game = None
         anchor = np.array([anchor['features']])
-        searching_df = df.clone()
+        searching_df = df.filter(~pl.col('id').is_in(recommendations))
         while similarity < THRESHOLD:
             game = searching_df.sample(1)
             searching_df = searching_df.filter(pl.col('id') != game['id'])

@@ -15,8 +15,6 @@ game_list = []
 
 for entry in loaded_data:
     label_list.append(entry['label'])
-    #anchor_list.append(f"{entry['anchor']['features']} {entry['anchor']['description']}")
-    #game_list.append(f"{entry['game']['features']} {entry['game']['description']}")
     anchor_list.append(f"{entry['anchor']['features']}")
     game_list.append(f"{entry['game']['features']}")
 
